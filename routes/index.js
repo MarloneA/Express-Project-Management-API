@@ -7,8 +7,8 @@ import logger from "../middleware/logger.js";
 const router = Router();
 
 router.use(logger);
-router.use(taskRouter);
 router.use(usersRouter);
-router.use(authRouter)
+router.use(authRouter);
+router.use(taskRouter);
 
 export default router;
