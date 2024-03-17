@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { usersList } from "../../constants.js";
+import { usersList } from "../../utils/constants.js";
 import passport from "../../strategy/local-strategy.js";
+import { hashPassword } from "../../utils/helpers.js";
 
 const router = Router();
 
@@ -13,7 +14,22 @@ router.get("/api/users", (request, response) => {
   });
 });
 
-router.get("/api/user/:id", (request, response) => {});
+router.post("/api/auth/register", (request, response) => {
+  const {
+    body: { email, password },
+  } = request;
+
+  const safePassword = hashPassword(password);
+
+  const newUser = {
+    id: crypto.randomUUID(),
+    email,
+    password: safePassword,
+  };
+
+  usersList.push(newUser);
+  response.sendStatus(200);
+});
 
 router.post(
   "/api/auth/login",
@@ -25,7 +41,10 @@ router.post(
 
 router.get("/api/auth/status", (request, response) => {
   return request.user
-    ? response.status(200).send(request.user)
+    ? response.status(200).send({
+        status: "authenticated",
+        userId: request.user,
+      })
     : response.status(401).send({ message: "Not Authenticated" });
 });
 

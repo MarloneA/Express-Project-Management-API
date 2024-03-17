@@ -1,6 +1,6 @@
 import { Router, response } from "express";
-import { taskList } from "../../constants.js";
-import { generateRandom4Digits } from "../../utils.js";
+import { taskList } from "../../utils/constants.js";
+import { generateRandom4Digits } from "../../utils/generateRandom.js";
 import { taskValidation } from "../../validation/taskValidation.js";
 import { validateQueryParams } from "../../validation/queryParamsValidation.js";
 
