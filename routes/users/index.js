@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { usersList } from "../../constants.js";
+import passport from "../../strategy/local-strategy.js";
 
 const router = Router();
 
@@ -14,23 +15,21 @@ router.get("/api/users", (request, response) => {
 
 router.get("/api/user/:id", (request, response) => {});
 
-router.post("/api/auth", (request, response) => {
-  const {
-    body: { email, password },
-  } = request;
-
-  const findUser = usersList.find((user) => user.email === email);
-
-  if (!findUser || findUser.password !== password) {
-    return response.status(401).send({ message: "Bad credentials" });
+router.post(
+  "/api/auth/login",
+  passport.authenticate("local"),
+  (request, response) => {
+    response.sendStatus(200);
   }
-
-  request.session.user = findUser;
-
-  return response.status(200).send(findUser);
-});
+);
 
 router.get("/api/auth/status", (request, response) => {
+  return request.user
+    ? response.status(200).send(request.user)
+    : response.status(401).send({ message: "Not Authenticated" });
+});
+
+router.get("/api/auth/logout", (request, response) => {
   return request.session.user
     ? response.status(200).send(request.session.user)
     : response.status(401).send({ message: "Not Authenticated" });

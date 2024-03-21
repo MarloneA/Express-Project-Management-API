@@ -7,7 +7,8 @@ import { validateQueryParams } from "../../validation/queryParamsValidation.js";
 const router = Router();
 
 router.use((request, response, next) => {
-  if (!request.session.user) {
+  console.log("request: ", request);
+  if (!request.user) {
     return response.status(401).send({
       message: "unauthorized",
     });
@@ -26,7 +27,7 @@ router.get("/api/tasks", validateQueryParams, (request, response) => {
     query: { filter, value, order, orderBy },
   } = request;
 
-  if (request.session.user) {
+  if (request.user) {
     const tasks = [...taskList];
 
     if (orderBy && order === "ASC") {

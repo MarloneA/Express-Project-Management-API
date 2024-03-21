@@ -2,6 +2,8 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import routes from "./routes/index.js";
+import passport from "passport";
+import "./strategy/local-strategy.js";
 
 export default function createApp() {
   const app = express();
@@ -23,6 +25,8 @@ export default function createApp() {
       msg: "Api is healthy",
     });
   });
+  app.use(passport.initialize());
+  app.use(passport.session());
   app.use(routes);
 
   return app;
