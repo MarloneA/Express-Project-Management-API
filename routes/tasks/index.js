@@ -1,10 +1,19 @@
-import { Router } from "express";
+import { Router, response } from "express";
 import { taskList } from "../../constants.js";
 import { generateRandom4Digits } from "../../utils.js";
 import { taskValidation } from "../../validation/taskValidation.js";
 import { validateQueryParams } from "../../validation/queryParamsValidation.js";
 
 const router = Router();
+
+router.use((request, response, next) => {
+  if (!request.session.user) {
+    return response.status(401).send({
+      message: "unauthorized",
+    });
+  }
+  next();
+});
 
 router.get("/api/", (request, response) => {
   response.status(200).send({
@@ -17,28 +26,34 @@ router.get("/api/tasks", validateQueryParams, (request, response) => {
     query: { filter, value, order, orderBy },
   } = request;
 
-  const tasks = [...taskList];
+  if (request.session.user) {
+    const tasks = [...taskList];
 
-  if (orderBy && order === "ASC") {
-    tasks.sort((a, b) => a[orderBy].localeCompare(b[orderBy]));
-  } else if (order === "DSC") {
-    tasks.sort((a, b) => b[orderBy].localeCompare(a[orderBy]));
-  }
+    if (orderBy && order === "ASC") {
+      tasks.sort((a, b) => a[orderBy].localeCompare(b[orderBy]));
+    } else if (order === "DSC") {
+      tasks.sort((a, b) => b[orderBy].localeCompare(a[orderBy]));
+    }
 
-  if (filter && value) {
-    const filteredTasks = tasks.filter((task) => task[filter] === value);
+    if (filter && value) {
+      const filteredTasks = tasks.filter((task) => task[filter] === value);
 
-    return response.status(200).send({
-      data: filteredTasks,
-      count: filteredTasks.length,
+      return response.status(200).send({
+        data: filteredTasks,
+        count: filteredTasks.length,
+      });
+    }
+
+    response.status(200).send({
+      data: {
+        tasks,
+        count: tasks.length,
+      },
     });
   }
 
-  response.status(200).send({
-    data: {
-      tasks,
-      count: tasks.length,
-    },
+  response.status(403).send({
+    message: "unauthorized user",
   });
 });
 
@@ -126,6 +141,36 @@ router.delete("/api/task/:id", (request, response) => {
       message: `task with id ${id} cannot be found`,
     },
   });
+});
+
+router.post("/api/task/favourite", (request, response) => {
+  if (!request.session.user)
+    return response.status(401).send({ message: "unauthorized" });
+
+  const { body: item } = request;
+
+  const { favourite } = request.session;
+
+  if (favourite) {
+    favourite.push(item);
+  } else {
+    request.session.favourite = [item];
+  }
+  return response.status(201).send(item);
+});
+
+router.get("/api/task/favourite", (request, response) => {
+  return request.session.favourite
+    ? response.status(200).send({
+        data: {
+          favourite: request.session.favourite,
+        },
+      })
+    : response.status(200).send({
+        data: {
+          favourite: [],
+        },
+      });
 });
 
 export default router;
