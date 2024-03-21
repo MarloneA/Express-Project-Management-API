@@ -1,11 +1,25 @@
 import { Router } from "express";
 import { usersList } from "../../utils/constants.js";
-import passport from "../../strategy/local-strategy.js";
 import { hashPassword } from "../../utils/helpers.js";
 
 const router = Router();
 
 router.get("/api/users", (request, response) => {
+  const {
+    query: { filter, value },
+  } = request;
+
+  if (filter && value) {
+    const filteredUsers = usersList.filter((user) => user[filter] === value);
+
+    return response.status(200).send({
+      data: {
+        users: filteredUsers,
+        count: filteredUsers.length,
+      },
+    });
+  }
+
   response.status(200).send({
     data: {
       users: usersList,
@@ -14,7 +28,30 @@ router.get("/api/users", (request, response) => {
   });
 });
 
-router.post("/api/auth/register", (request, response) => {
+router.get("/api/users/search", (request, response) => {
+  const {
+    query: { q },
+  } = request;
+
+  if (q) {
+    const searchResults = usersList.filter((user) =>
+      user.name.toLowerCase().includes(q.toLowerCase())
+    );
+    response.status(200).send({
+      tasks: searchResults,
+      count: searchResults.length,
+    });
+  }
+
+  response.status(200).send({
+    data: {
+      users: usersList,
+      count: usersList.length,
+    },
+  });
+});
+
+router.post("/api/users", (request, response) => {
   const {
     body: { email, password },
   } = request;
@@ -28,30 +65,38 @@ router.post("/api/auth/register", (request, response) => {
   };
 
   usersList.push(newUser);
+
   response.sendStatus(200);
 });
 
-router.post(
-  "/api/auth/login",
-  passport.authenticate("local"),
-  (request, response) => {
-    response.sendStatus(200);
-  }
-);
+router.put("/api/users/:id", (request, response) => {
+  const {
+    body,
+    params: { id },
+  } = request;
 
-router.get("/api/auth/status", (request, response) => {
-  return request.user
-    ? response.status(200).send({
-        status: "authenticated",
-        userId: request.user,
-      })
-    : response.status(401).send({ message: "Not Authenticated" });
+  const findUserIndex = usersList.findIndex((user) => user.id === id);
+
+  usersList.splice(findUserIndex, 1, {
+    ...usersList[findUserIndex],
+    ...body,
+  });
+
+  response.send({
+    data: {
+      message: "user has been updated",
+    },
+  });
 });
 
-router.get("/api/auth/logout", (request, response) => {
-  return request.session.user
-    ? response.status(200).send(request.session.user)
-    : response.status(401).send({ message: "Not Authenticated" });
+router.delete("/api/users/:id", (request, response) => {
+  const {
+    params: { id },
+  } = request;
+
+  usersList.filter((user) => user.id !== id);
+
+  response.sendStatus(200);
 });
 
 export default router;

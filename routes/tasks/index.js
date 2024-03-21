@@ -7,7 +7,6 @@ import { validateQueryParams } from "../../validation/queryParamsValidation.js";
 const router = Router();
 
 router.use((request, response, next) => {
-  console.log("request: ", request);
   if (!request.user) {
     return response.status(401).send({
       message: "unauthorized",
@@ -19,6 +18,37 @@ router.use((request, response, next) => {
 router.get("/api/", (request, response) => {
   response.status(200).send({
     msg: "This api handles data for a task manager app",
+  });
+});
+
+router.get("/api/tasks/search", validateQueryParams, (request, response) => {
+  const {
+    query: { q },
+  } = request;
+
+  if (request.user) {
+    const tasks = [...taskList];
+
+    if (q) {
+      const searchResults = taskList.filter((task) =>
+        task.title.toLowerCase().includes(q.toLowerCase())
+      );
+      response.status(200).send({
+        tasks: searchResults,
+        count: searchResults.length,
+      });
+    }
+
+    response.status(200).send({
+      data: {
+        tasks,
+        count: tasks.length,
+      },
+    });
+  }
+
+  response.status(403).send({
+    message: "unauthorized user",
   });
 });
 
