@@ -12,7 +12,7 @@ export default function createApp() {
   app.use(cookieParser());
   app.use(
     session({
-      secret: "my-secret-string",
+      secret: process.env.SESSION_SECRET_KEY,
       saveUninitialized: false,
       resave: false,
       cookie: {

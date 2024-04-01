@@ -1,4 +1,4 @@
-import { getUsersService } from "../services/users";
+import { getUsersService } from "../controllers/users";
 import { usersList } from "../utils/constants.js";
 
 const request = {

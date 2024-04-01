@@ -1,3 +1,4 @@
+import { filterTasks, searchTasks } from "../services/tasks/index.js";
 import { taskList } from "../utils/constants.js";
 import { generateRandom4Digits } from "../utils/generateRandom.js";
 
@@ -7,12 +8,9 @@ export const searchTasksByQuery = (request, response) => {
   } = request;
 
   if (request.user) {
-    const tasks = [...taskList];
-
     if (q) {
-      const searchResults = taskList.filter((task) =>
-        task.title.toLowerCase().includes(q.toLowerCase())
-      );
+      const searchResults = searchTasks(q);
+
       response.status(200).send({
         tasks: searchResults,
         count: searchResults.length,
@@ -22,7 +20,7 @@ export const searchTasksByQuery = (request, response) => {
     response.status(200).send({
       data: {
         tasks,
-        count: tasks.length,
+        count: taskList.length,
       },
     });
   }
@@ -38,17 +36,9 @@ export const getAllTasks = (request, response) => {
   } = request;
 
   if (request.user) {
-    const tasks = [...taskList];
+    const filteredTasks = filterTasks({ filter, value, order, orderBy });
 
-    if (orderBy && order === "ASC") {
-      tasks.sort((a, b) => a[orderBy].localeCompare(b[orderBy]));
-    } else if (order === "DSC") {
-      tasks.sort((a, b) => b[orderBy].localeCompare(a[orderBy]));
-    }
-
-    if (filter && value) {
-      const filteredTasks = tasks.filter((task) => task[filter] === value);
-
+    if (filteredTasks) {
       return response.status(200).send({
         data: filteredTasks,
         count: filteredTasks.length,

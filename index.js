@@ -1,7 +1,9 @@
+import dotenv from "dotenv";
 import createApp from "./app.js";
 
-const PORT = 8080;
+dotenv.config();
 
+const PORT = process.env.PORT;
 const app = createApp();
 
 app.listen(PORT, () => {

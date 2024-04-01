@@ -11,7 +11,7 @@ import {
   getFavourites,
   getTasksById,
   searchTasksByQuery,
-} from "../../services/tasks.js";
+} from "../../controllers/tasks.js";
 import { authoriseUser } from "../../middleware/authoriseUser.js";
 
 const router = Router();

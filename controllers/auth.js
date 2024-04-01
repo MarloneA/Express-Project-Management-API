@@ -1,21 +1,16 @@
 import { hashPassword } from "../utils/helpers.js";
 import { usersList } from "../utils/constants.js";
+import { addUser } from "../services/auth/index.js";
 
 export const registerUser = (request, response) => {
-  const {
-    body: { email, password },
-  } = request;
+  try {
+    addUser({ ...request.body });
+  } catch (error) {
+    response.status(404).send({
+      error: error.message,
+    });
+  }
 
-  const safePassword = hashPassword(password);
-
-  const newUser = {
-    id: crypto.randomUUID(),
-    email,
-    ...request.body,
-    password: safePassword,
-  };
-
-  usersList.push(newUser);
   response.sendStatus(200);
 };
 
@@ -33,7 +28,6 @@ export const getAuthStatus = (request, response) => {
 };
 
 export const logout = (request, response) => {
-
   if (!request.user) {
     return response.status(401).send({
       message: "user not logged in",
