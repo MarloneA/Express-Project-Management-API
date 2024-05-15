@@ -4,8 +4,8 @@ import {
   createNewUser,
   updateUser,
   deleteUser,
-} from "../services/users/index.js";
-import { usersList } from "../utils/constants.js";
+} from "./services.js";
+import { usersList } from "../../../utils/constants.js";
 
 export const getUsersService = (request, response) => {
   const {

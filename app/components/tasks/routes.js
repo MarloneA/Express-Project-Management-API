@@ -1,7 +1,7 @@
 import { Router } from "express";
 
-import { taskValidation } from "../../validation/taskValidation.js";
-import { validateQueryParams } from "../../validation/queryParamsValidation.js";
+import { taskValidation } from "../../../validation/taskValidation.js";
+import { validateQueryParams } from "../../../validation/queryParamsValidation.js";
 import {
   addTaskToFavourites,
   createTask,
@@ -11,7 +11,7 @@ import {
   getFavourites,
   getTasksById,
   searchTasksByQuery,
-} from "../../controllers/tasks.js";
+} from "./controllers.js";
 import { authoriseUser } from "../../middleware/authoriseUser.js";
 
 const router = Router();

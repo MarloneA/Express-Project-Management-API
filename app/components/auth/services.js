@@ -1,5 +1,5 @@
-import { usersList } from "../../utils/constants.js";
-import { hashPassword } from "../../utils/helpers.js";
+import { usersList } from "../../../utils/constants.js";
+import { hashPassword } from "../../../utils/helpers.js";
 
 export const addUser = (user) => {
   if (!user) {

@@ -1,12 +1,7 @@
 import { Router } from "express";
-import passport from "../../strategy/local-strategy.js";
+import passport from "../../../strategy/local-strategy.js";
 
-import {
-  getAuthStatus,
-  login,
-  logout,
-  registerUser,
-} from "../../controllers/auth.js";
+import { getAuthStatus, login, logout, registerUser } from "./controllers.js";
 
 const router = Router();
 

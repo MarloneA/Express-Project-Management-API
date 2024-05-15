@@ -1,6 +1,6 @@
-import { hashPassword } from "../utils/helpers.js";
-import { usersList } from "../utils/constants.js";
-import { addUser } from "../services/auth/index.js";
+import { hashPassword } from "../../../utils/helpers.js";
+import { usersList } from "../../../utils/constants.js";
+import { addUser } from "./services.js";
 
 export const registerUser = (request, response) => {
   try {

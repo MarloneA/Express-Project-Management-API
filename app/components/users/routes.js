@@ -5,7 +5,7 @@ import {
   editUsers,
   getUsersService,
   searchUsersByQuery,
-} from "../../controllers/users.js";
+} from "./controllers.js";
 
 const router = Router();
 

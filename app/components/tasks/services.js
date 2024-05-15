@@ -1,5 +1,5 @@
-import { taskList } from "../../utils/constants.js";
-import { generateRandom4Digits } from "../../utils/generateRandom.js";
+import { taskList } from "../../../utils/constants.js";
+import { generateRandom4Digits } from "../../../utils/generateRandom.js";
 
 export const searchTasks = (searchQuery) => {
   const tasks = taskList.filter((task) =>

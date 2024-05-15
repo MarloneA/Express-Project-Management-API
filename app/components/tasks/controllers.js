@@ -5,8 +5,8 @@ import {
   filterTasks,
   getTaskById,
   searchTasks,
-} from "../services/tasks/index.js";
-import { taskList } from "../utils/constants.js";
+} from "./services.js";
+import { taskList } from "../../../utils/constants.js";
 
 export const searchTasksByQuery = (request, response) => {
   const {
