@@ -12,7 +12,11 @@ const router = Router();
 
 router
   .post("/api/auth/register", registerUser)
-  .post("/api/auth/login", passport.authenticate("local"), login)
+  .post(
+    "/api/auth/login",
+    passport.authenticate("local", { failureMessage: true }),
+    login
+  )
   .get("/api/auth/status", getAuthStatus)
   .post("/api/auth/logout", logout);
 

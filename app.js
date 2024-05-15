@@ -3,10 +3,18 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import routes from "./routes/index.js";
 import passport from "passport";
+import cors from "cors";
 import "./strategy/local-strategy.js";
 
 export default function createApp() {
   const app = express();
+
+  app.use(
+    cors({
+      origin: process.env.CORS_ALLOW_URL,
+      credentials: true,
+    })
+  );
 
   app.use(express.json());
   app.use(cookieParser());
@@ -17,7 +25,10 @@ export default function createApp() {
       resave: false,
       cookie: {
         maxAge: 60000 * 60,
+        secure: false, //set to true when deploying to prod
+        httpOnly: true,
       },
+      name: process.env.SESSION_NAME,
     })
   );
   app.get("/", (request, response) => {

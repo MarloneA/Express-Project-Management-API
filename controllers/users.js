@@ -1,5 +1,11 @@
+import {
+  filterUsersByParam,
+  searchUsersByQTerm,
+  createNewUser,
+  updateUser,
+  deleteUser,
+} from "../services/users/index.js";
 import { usersList } from "../utils/constants.js";
-import { hashPassword } from "../utils/helpers.js";
 
 export const getUsersService = (request, response) => {
   const {
@@ -7,12 +13,12 @@ export const getUsersService = (request, response) => {
   } = request;
 
   if (filter && value) {
-    const filteredUsers = usersList.filter((user) => user[filter] === value);
+    const { users, count } = filterUsersByParam({ filter, value });
 
     return response.status(200).send({
       data: {
-        users: filteredUsers,
-        count: filteredUsers.length,
+        users,
+        count,
       },
     });
   }
@@ -31,12 +37,11 @@ export const searchUsersByQuery = (request, response) => {
   } = request;
 
   if (q) {
-    const searchResults = usersList.filter((user) =>
-      user.name.toLowerCase().includes(q.toLowerCase())
-    );
+    const { users, count } = searchUsersByQTerm({ q });
+
     return response.status(200).send({
-      tasks: searchResults,
-      count: searchResults.length,
+      users,
+      count,
     });
   }
 
@@ -50,16 +55,7 @@ export const searchUsersByQuery = (request, response) => {
 
 export const createUsers = (request, response) => {
   const { body } = request;
-
-  const safePassword = hashPassword(body.password);
-
-  const newUser = {
-    id: crypto.randomUUID(),
-    ...body,
-    password: safePassword,
-  };
-
-  usersList.push(newUser);
+  const { data, error } = createNewUser(body);
 
   return response.sendStatus(200);
 };
@@ -70,14 +66,9 @@ export const editUsers = (request, response) => {
     params: { id },
   } = request;
 
-  const findUserIndex = usersList.findIndex((user) => user.id === id);
+  const { data, error } = updateUser({ id, body });
 
-  usersList.splice(findUserIndex, 1, {
-    ...usersList[findUserIndex],
-    ...body,
-  });
-
-  return response.send({
+  return response.status(200).send({
     data: {
       message: "user has been updated",
     },
@@ -89,9 +80,7 @@ export const deleteUserById = (request, response) => {
     params: { id },
   } = request;
 
-  const findUserIndex = usersList.findIndex((user) => user.id === id);
-
-  usersList.splice(findUserIndex, 1);
+  const { data, error } = deleteUser({ id });
 
   return response.sendStatus(200);
 };

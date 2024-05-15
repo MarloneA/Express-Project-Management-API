@@ -10,12 +10,14 @@ export const registerUser = (request, response) => {
       error: error.message,
     });
   }
-
-  response.sendStatus(200);
+  response.status(200).send({ message: "registered" });
 };
 
 export const login = (request, response) => {
-  response.sendStatus(200);
+  response.status(200).send({
+    status: "authenticated",
+    user: request.user,
+  });
 };
 
 export const getAuthStatus = (request, response) => {

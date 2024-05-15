@@ -12,7 +12,9 @@ passport.deserializeUser((id, done) => {
   try {
     const findUser = usersList.find((user) => user.id === id);
 
-    if (!findUser) throw new Error("user not found");
+    if (!findUser) {
+      return done(null, false, { message: "user not found" });
+    }
     done(null, findUser.id);
   } catch (error) {
     done(err, null);
@@ -20,20 +22,28 @@ passport.deserializeUser((id, done) => {
 });
 
 passport.use(
-  new Strategy({ usernameField: "email" }, (email, password, done) => {
-    try {
-      const finduser = usersList.find((user) => user.email === email);
+  new Strategy(
+    { usernameField: "email", passReqToCallback: true },
+    (request, email, password, done) => {
+      try {
+        const finduser = usersList.find((user) => user.email === email);
+        if (!finduser) {
+          request.res.status(400).send({
+            message: "user not found",
+          });
+          done(null, false);
+        }
 
-      if (!finduser) throw new Error("user not found");
-
-      if (!comparePassword(password, finduser.password)) {
-        throw new Error("invalid credentials");
+        if (!comparePassword(password, finduser.password)) {
+          request.res.status(400).send({ message: "invalid credentials" });
+          return done(null, false);
+        }
+        done(null, finduser);
+      } catch (error) {
+        done(error, null);
       }
-      done(null, finduser);
-    } catch (error) {
-      done(error, null);
     }
-  })
+  )
 );
 
 export default passport;

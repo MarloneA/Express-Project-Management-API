@@ -16,8 +16,6 @@ import { authoriseUser } from "../../middleware/authoriseUser.js";
 
 const router = Router();
 
-router.use(authoriseUser);
-
 router
   .get("/api/tasks/search", validateQueryParams, searchTasksByQuery)
   .get("/api/tasks", validateQueryParams, getAllTasks)

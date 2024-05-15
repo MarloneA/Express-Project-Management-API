@@ -1,32 +1,32 @@
-import { filterTasks, searchTasks } from "../services/tasks/index.js";
+import {
+  createNewTask,
+  deleteTask,
+  editTask,
+  filterTasks,
+  getTaskById,
+  searchTasks,
+} from "../services/tasks/index.js";
 import { taskList } from "../utils/constants.js";
-import { generateRandom4Digits } from "../utils/generateRandom.js";
 
 export const searchTasksByQuery = (request, response) => {
   const {
     query: { q },
   } = request;
 
-  if (request.user) {
-    if (q) {
-      const searchResults = searchTasks(q);
-
-      response.status(200).send({
-        tasks: searchResults,
-        count: searchResults.length,
-      });
-    }
+  if (q) {
+    const { tasks, count } = searchTasks(q);
 
     response.status(200).send({
-      data: {
-        tasks,
-        count: taskList.length,
-      },
+      tasks,
+      count,
     });
   }
 
-  response.status(403).send({
-    message: "unauthorized user",
+  response.status(200).send({
+    data: {
+      tasks: taskList,
+      count: taskList.length,
+    },
   });
 };
 
@@ -35,26 +35,20 @@ export const getAllTasks = (request, response) => {
     query: { filter, value, order, orderBy },
   } = request;
 
-  if (request.user) {
-    const filteredTasks = filterTasks({ filter, value, order, orderBy });
+  const { tasks, count } = filterTasks({ filter, value, order, orderBy });
 
-    if (filteredTasks) {
-      return response.status(200).send({
-        data: filteredTasks,
-        count: filteredTasks.length,
-      });
-    }
-
-    response.status(200).send({
-      data: {
-        tasks,
-        count: tasks.length,
-      },
+  if (tasks) {
+    return response.status(200).send({
+      data: tasks,
+      count,
     });
   }
 
-  response.status(403).send({
-    message: "unauthorized user",
+  response.status(200).send({
+    data: {
+      tasks,
+      count,
+    },
   });
 };
 
@@ -62,10 +56,6 @@ export const getTasksById = (request, response) => {
   const {
     params: { id },
   } = request;
-
-  const getTaskById = (id) => {
-    return taskList.filter((task) => task.id === id);
-  };
 
   const task = getTaskById(id);
 
@@ -81,15 +71,7 @@ export const createTask = (request, response) => {
     body: { title, status, priority },
   } = request;
 
-  const newTask = {
-    id: crypto.randomUUID(),
-    taskid: `TASK-${generateRandom4Digits()}`,
-    title,
-    status,
-    priority,
-  };
-
-  const count = taskList.push(newTask);
+  const { count } = createNewTask({ title, status, priority });
 
   response.status(201).send({
     data: {
@@ -105,19 +87,22 @@ export const editTaskById = (request, response) => {
     body,
   } = request;
 
-  const findTaskIndex = taskList.findIndex((task) => task.id === id);
+  try {
+    const { taskList, status } = editTask(id, body);
 
-  taskList.splice(findTaskIndex, 1, {
-    ...taskList[findTaskIndex],
-    ...body,
-  });
-
-  response.status(201).send({
-    data: {
-      task: taskList,
-      status: "edited",
-    },
-  });
+    response.status(201).send({
+      data: {
+        task: taskList,
+        status: status,
+      },
+    });
+  } catch (error) {
+    response.status(404).send({
+      error: {
+        message: error.message,
+      },
+    });
+  }
 };
 
 export const deleteTaskById = (request, response) => {
@@ -125,23 +110,21 @@ export const deleteTaskById = (request, response) => {
     params: { id },
   } = request;
 
-  const selectedIndex = taskList.findIndex((task) => task.id === id);
-
-  if (selectedIndex > -1) {
-    taskList.splice(selectedIndex, 1);
+  try {
+    const { message } = deleteTask(id);
 
     response.status(200).send({
       data: {
-        message: `task with id ${id} was deleted`,
+        message: message,
+      },
+    });
+  } catch (error) {
+    response.status(404).send({
+      error: {
+        message: error.message,
       },
     });
   }
-
-  response.status(404).send({
-    data: {
-      message: `task with id ${id} cannot be found`,
-    },
-  });
 };
 
 export const addTaskToFavourites = (request, response) => {
