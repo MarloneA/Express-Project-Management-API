@@ -103,9 +103,10 @@ express-project-management-api/
 ## Features
 
 - **Express.js**: A fast, unopinionated, minimalist web framework for Node.js.
-- **MongoDB**: A NoSQL database for storing project and user data.
-- **JWT Authentication**: Secure authentication using JSON Web Tokens.
+- **PostgreSQL**: A SQL database for storing project and user data.
+- **JWT Authentication**: Secure authorization using JSON Web Tokens.
 - **RESTful API**: A well-structured and easy-to-use API.
+- **Cookies**: Uses cookies to manage sessions.
 
 ## Configuration
 
@@ -115,11 +116,11 @@ Create a `.env` file in the root directory and add the following environment var
 
 ```
 PORT=3000
-MONGO_URI=<your-mongodb-uri>
+DATABASE_URL=<your-postgres-uri>
 JWT_SECRET=<your-jwt-secret>
 ```
 
-Replace `<your-mongodb-uri>` and `<your-jwt-secret>` with your actual MongoDB URI and JWT secret.
+Replace `<your-postgres-uri>` and `<your-jwt-secret>` with your actual MongoDB URI and JWT secret.
 
 ## API Endpoints
 
