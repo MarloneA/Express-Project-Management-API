@@ -1,5 +1,7 @@
+import { Prisma } from "@prisma/client";
 import { usersList } from "../../../utils/constants.js";
 import { hashPassword } from "../../../utils/helpers.js";
+import { prisma } from "../../models/client.js";
 
 export const filterUsersByParam = (params) => {
   const { filter, value } = params;
@@ -9,28 +11,43 @@ export const filterUsersByParam = (params) => {
   return { users, count: users.length };
 };
 
-export const searchUsersByQTerm = (params) => {
+export const searchUsersByQTerm = async (params) => {
   const { q } = params;
 
-  const searchResults = usersList.filter((user) =>
-    user?.name.toLowerCase().includes(q.toLowerCase())
-  );
+  const result = await prisma.user.findMany({
+    where: {
+      name: {
+        contains: q,
+      },
+    },
+  });
 
-  return { users: searchResults, count: searchResults.length };
+  return { users: result, count: result.length };
 };
 
-export const createNewUser = (user) => {
-  const safePassword = hashPassword(user.password);
+export const createNewUser = async (user) => {
+  try {
+    const data = await prisma.user.create({
+      data: {
+        ...user,
+        password: hashPassword(user.password),
+      },
+    });
 
-  const newUser = {
-    id: crypto.randomUUID(),
-    ...user,
-    password: safePassword,
-  };
-
-  usersList.push(newUser);
-
-  return { data: usersList, error: null };
+    return { data, error: null };
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      // The .code property can be accessed in a type-safe manner
+      if (error.code === "P2002") {
+        return {
+          data: {},
+          error:
+            "unique constraint violation, new user cannot be created with this email",
+        };
+      }
+      throw error;
+    }
+  }
 };
 
 export const updateUser = (payload) => {

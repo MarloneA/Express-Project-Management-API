@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^5.14.0",
     "@types/jest": "^29.5.12",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
@@ -29,6 +30,7 @@
     "@babel/core": "^7.24.0",
     "@babel/node": "^7.23.9",
     "@babel/preset-env": "^7.24.0",
+    "prisma": "^5.14.0",
     "superagent": "^8.1.2",
     "supertest": "^6.3.4"
   }

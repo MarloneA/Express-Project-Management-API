@@ -50,7 +50,7 @@ export const usersList = [
     },
     username: "john_doe_username",
     password: "Joh@nDoe12",
-    role: "admin"
+    role: "admin",
   },
   {
     id: "4e0b71e8-bc4a-49cf-9f5f-47a925d81b0a",
@@ -65,7 +65,7 @@ export const usersList = [
     },
     username: "jane_smith_username",
     password: "Jan@eSmi456",
-    role: "client"
+    role: "client",
   },
   {
     id: "12006b6f-90d9-4d87-9d0b-8830cbf392a1",
@@ -80,7 +80,7 @@ export const usersList = [
     },
     username: "bob_johnson_username",
     password: "B@bJohns789",
-    role: "client"
+    role: "client",
   },
   {
     id: "f6b44266-eed3-45c2-9b89-4875295ee25c",
@@ -95,7 +95,7 @@ export const usersList = [
     },
     username: "alice_brown_username",
     password: "Al!ceBro987",
-    role: "client"
+    role: "client",
   },
   {
     id: "d5cde36b-0b09-4a49-98b1-8ea7712d245d",
@@ -110,7 +110,7 @@ export const usersList = [
     },
     username: "charlie_davis_username",
     password: "Ch@rlieDa135",
-    role: "client"
+    role: "client",
   },
   {
     id: "a3d4d85f-d8fe-4c69-a96d-ded7d9038bae",
@@ -125,7 +125,7 @@ export const usersList = [
     },
     username: "eva_white_username",
     password: "Ev@Whit246",
-    role: "client"
+    role: "client",
   },
   {
     id: "675b0e8a-6f32-4cc4-944f-9a9688f5a485",
@@ -140,7 +140,7 @@ export const usersList = [
     },
     username: "david_lee_username",
     password: "Dav!dLee975",
-    role: "client"
+    role: "client",
   },
   {
     id: "1e90eaa4-c8a1-471f-af2a-73c08d6df6d3",
@@ -155,7 +155,7 @@ export const usersList = [
     },
     username: "grace_miller_username",
     password: "Gr@ceMil864",
-    role: "client"
+    role: "client",
   },
   {
     id: "4f8f1a6d-0ad2-459c-b429-4c4d45ed64ee",
@@ -170,7 +170,7 @@ export const usersList = [
     },
     username: "frank_wilson_username",
     password: "Fr@nkWil753",
-    role: "client"
+    role: "client",
   },
   {
     id: "315fc5a9-242c-4ea6-b637-2977f8a75dab",
@@ -185,9 +185,8 @@ export const usersList = [
     },
     username: "hannah_adams_username",
     password: "Hann@hAd320",
-    role: "client"
+    role: "client",
   },
 ];
 
-
-export const roles = "client" | "admin"
+export const roles = "client" | "admin" | "qa" | "product" | "dev";

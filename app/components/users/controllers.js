@@ -31,13 +31,13 @@ export const getUsersService = (request, response) => {
   });
 };
 
-export const searchUsersByQuery = (request, response) => {
+export const searchUsersByQuery = async (request, response) => {
   const {
     query: { q },
   } = request;
 
   if (q) {
-    const { users, count } = searchUsersByQTerm({ q });
+    const { users, count } = await searchUsersByQTerm({ q });
 
     return response.status(200).send({
       users,
@@ -53,11 +53,21 @@ export const searchUsersByQuery = (request, response) => {
   });
 };
 
-export const createUsers = (request, response) => {
+export const createUsers = async (request, response) => {
   const { body } = request;
-  const { data, error } = createNewUser(body);
+  const { data, error } = await createNewUser(body);
 
-  return response.sendStatus(200);
+  if (error) {
+    return response.status(400).send({
+      error,
+    });
+  }
+
+  return response.status(200).send({
+    data: {
+      ...data,
+    },
+  });
 };
 
 export const editUsers = (request, response) => {

@@ -25,6 +25,12 @@ RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=cache,target=/root/.npm \
     npm ci --omit=dev
 
+# Copy the schema.prisma file to the container
+COPY schema.prisma ./
+
+# Run npx prisma generate to generate Prisma client
+RUN npx prisma generate
+
 # Run the application as a non-root user.
 USER node
 
