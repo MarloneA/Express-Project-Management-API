@@ -8,12 +8,9 @@ import { authoriseUser } from "./middleware/authoriseUser.js";
 const router = Router();
 
 router.use(logger);
-
 router.use(usersRouter);
 router.use(authRouter);
-
 router.use(authoriseUser);
-
 router.use(taskRouter);
 
 export default router;

@@ -3,14 +3,14 @@ import {
   createUsers,
   deleteUserById,
   editUsers,
-  getUsersService,
+  getUsers,
   searchUsersByQuery,
 } from "./controllers.js";
 
 const router = Router();
 
 router
-  .get("/api/users", getUsersService)
+  .get("/api/users", getUsers)
   .get("/api/users/search", searchUsersByQuery)
   .post("/api/users", createUsers)
   .put("/api/users/:id", editUsers)

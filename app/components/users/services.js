@@ -1,72 +1,130 @@
-import { Prisma } from "@prisma/client";
-import { usersList } from "../../../utils/constants.js";
 import { hashPassword } from "../../../utils/helpers.js";
 import { prisma } from "../../models/client.js";
 
-export const filterUsersByParam = (params) => {
-  const { filter, value } = params;
+export const getAllUsers = async ({ filter, value }) => {
+  try {
+    if ((filter, value)) {
+      const users = await prisma.user.findMany({
+        where: {
+          [filter]: {
+            contains: value,
+            mode: "insensitive",
+          },
+        },
+        include: {
+          tasks: true,
+        },
+      });
 
-  const users = usersList.filter((user) => user[filter] === value);
+      return { users, count: users.length, error: null };
+    }
 
-  return { users, count: users.length };
+    const users = await prisma.user.findMany({
+      include: {
+        tasks: true
+      }
+    });
+
+    return { users, count: users.length, error: null };
+  } catch (error) {
+    return { users: null, count: null, error: error };
+  }
 };
 
 export const searchUsersByQTerm = async (params) => {
   const { q } = params;
 
-  const result = await prisma.user.findMany({
-    where: {
-      name: {
-        contains: q,
-      },
-    },
-  });
-
-  return { users: result, count: result.length };
-};
-
-export const createNewUser = async (user) => {
   try {
-    const data = await prisma.user.create({
-      data: {
-        ...user,
-        password: hashPassword(user.password),
+    const users = await prisma.user.findMany({
+      where: {
+        name: {
+          contains: q,
+          mode: "insensitive",
+        },
       },
     });
-
-    return { data, error: null };
+    return { users, count: users.length, error: null };
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      // The .code property can be accessed in a type-safe manner
-      if (error.code === "P2002") {
-        return {
-          data: {},
-          error:
-            "unique constraint violation, new user cannot be created with this email",
-        };
-      }
-      throw error;
-    }
+    return { users: null, count: null, error: error };
   }
 };
 
-export const updateUser = (payload) => {
-  const { id, body } = payload;
+export const createNewUser = async (userDetails) => {
+  if (!userDetails) {
+    throw new Error("Invalid user details");
+  }
 
-  const findUserIndex = usersList.findIndex((user) => user.id === id);
+  try {
+    const user = await prisma.user.create({
+      data: {
+        ...userDetails,
+        password: hashPassword(userDetails.password),
+      },
+    });
 
-  usersList.splice(findUserIndex, 1, {
-    ...usersList[findUserIndex],
-    ...body,
-  });
-
-  return { data: usersList, error: null };
+    return { user, error: null };
+  } catch (error) {
+    return { user: null, error };
+  }
 };
 
-export const deleteUser = (id) => {
-  const findUserIndex = usersList.findIndex((user) => user.id === id);
+export const updateUser = async (payload) => {
+  const { id, body } = payload;
 
-  usersList.splice(findUserIndex, 1);
+  try {
+    const user = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        ...body,
+      },
+    });
 
-  return { data: usersList, error: null };
+    return { user, error: null };
+  } catch (error) {
+    return { user: null, error };
+  }
+};
+
+export const deleteUser = async ({ id }) => {
+  try {
+    const user = await prisma.user.delete({
+      where: {
+        id,
+      },
+    });
+
+    return { user, error: null };
+  } catch (error) {
+    return { user: null, error };
+  }
+};
+
+export const findUserByUniqueEmail = async (email) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const findUserByUniqueId = async (id) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
 };

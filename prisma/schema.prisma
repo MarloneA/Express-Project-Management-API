@@ -27,14 +27,14 @@ model User {
 
 model Task {
   id        String   @id @default(uuid())
-  taskid    Int      @default(autoincrement())
+  taskid    String   @unique
   title     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   archived  Boolean  @default(false)
   status    String
   priority  String
-  userId    String   @unique
+  userId    String
   author    User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
@@ -46,4 +46,11 @@ model Address {
   zip    String
   user   User   @relation(fields: [userId], references: [id])
   userId String @unique
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
 }

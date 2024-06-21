@@ -1,35 +1,49 @@
 import { taskList } from "../../../utils/constants.js";
 import { generateRandom4Digits } from "../../../utils/generateRandom.js";
+import { prisma } from "../../models/client.js";
 
-export const searchTasks = (searchQuery) => {
-  const tasks = taskList.filter((task) =>
-    task.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+export const searchTasks = async (searchQuery) => {
+  try {
+    const tasks = prisma.task.findMany({
+      where: {
+        title: {
+          contains: searchQuery,
+          mode: "insensitive",
+        },
+      },
+    });
 
-  return {
-    tasks,
-    count: tasks.length,
-  };
+    return { tasks, error: null };
+  } catch (error) {
+    return { tasks: null, error };
+  }
 };
 
-export const filterTasks = (filterParams) => {
+export const filterTasks = async ({ filterParams, id }) => {
   const { filter, value, order, orderBy } = filterParams;
 
-  if (orderBy && order === "ASC") {
-    taskList.sort((a, b) => a[orderBy].localeCompare(b[orderBy]));
-  } else if (order === "DSC") {
-    taskList.sort((a, b) => b[orderBy].localeCompare(a[orderBy]));
-  }
+  try {
+    if (!filterParams) {
+      const tasks = await prisma.task.findMany();
 
-  if (filter && value) {
-    const filteredTasks = taskList.filter(
-      (task) => task[filter].toLowerCase() === value.toLowerCase()
-    );
+      return { tasks, error };
+    }
 
-    return { tasks: filteredTasks, count: filteredTasks.length };
-  } else {
-    // If no filtering is performed, return all tasks
-    return { tasks: taskList, count: taskList.length };
+    const tasks = await prisma.task.findMany({
+      orderBy: {
+        [orderBy]: order,
+      },
+      where: {
+        [filter]: {
+          contains: value,
+          mode: "insensitive",
+        },
+      },
+    });
+
+    return { tasks, error: null };
+  } catch (error) {
+    return { tasks: null, error };
   }
 };
 
@@ -37,20 +51,37 @@ export const getTaskById = (id) => {
   return { task: taskList.filter((task) => task.id === id) };
 };
 
-export const createNewTask = ({ title, status, priority }) => {
+export const createNewTask = async ({ title, status, priority, userId }) => {
   const newTask = {
     id: crypto.randomUUID(),
     taskid: `TASK-${generateRandom4Digits()}`,
     title,
     status,
     priority,
+    author: {
+      connect: {
+        id: userId,
+      },
+    },
   };
 
-  const count = taskList.push(newTask);
+  try {
+    const task = await prisma.task.create({
+      data: {
+        ...newTask,
+      },
+    });
 
-  return {
-    count,
-  };
+    return {
+      task,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      task: null,
+      error,
+    };
+  }
 };
 
 export const editTask = (id, updatedTask) => {

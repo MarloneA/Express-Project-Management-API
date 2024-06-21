@@ -1,21 +1,25 @@
 import passport from "passport";
 import { Strategy } from "passport-local";
 
-import { usersList } from "../utils/constants.js";
 import { comparePassword } from "../utils/helpers.js";
+import {
+  findUserByUniqueEmail,
+  findUserByUniqueId,
+} from "../app/components/users/services.js";
 
 passport.serializeUser((user, done) => {
+  console.log("user serializer: ", user);
   done(null, user.id);
 });
 
-passport.deserializeUser((id, done) => {
+passport.deserializeUser(async (id, done) => {
   try {
-    const findUser = usersList.find((user) => user.id === id);
+    const user = await findUserByUniqueId(id);
 
-    if (!findUser) {
+    if (!user) {
       return done(null, false, { message: "user not found" });
     }
-    done(null, findUser.id);
+    done(null, user.id);
   } catch (error) {
     done(err, null);
   }
@@ -24,21 +28,22 @@ passport.deserializeUser((id, done) => {
 passport.use(
   new Strategy(
     { usernameField: "email", passReqToCallback: true },
-    (request, email, password, done) => {
+    async (request, email, password, done) => {
       try {
-        const finduser = usersList.find((user) => user.email === email);
-        if (!finduser) {
+        const user = await findUserByUniqueEmail(email);
+
+        if (!user) {
           request.res.status(400).send({
             message: "user not found",
           });
           done(null, false);
         }
 
-        if (!comparePassword(password, finduser.password)) {
+        if (!comparePassword(password, user.password)) {
           request.res.status(400).send({ message: "invalid credentials" });
           return done(null, false);
         }
-        done(null, finduser);
+        done(null, user);
       } catch (error) {
         done(error, null);
       }

@@ -13,41 +13,39 @@ export const searchTasksByQuery = (request, response) => {
     query: { q },
   } = request;
 
-  if (q) {
-    const { tasks, count } = searchTasks(q);
+  const { tasks, error } = searchTasks(q);
 
-    response.status(200).send({
-      tasks,
-      count,
+  if (error) {
+    response.status(400).send({
+      error: error.message,
     });
   }
 
   response.status(200).send({
     data: {
-      tasks: taskList,
-      count: taskList.length,
+      tasks,
+      count: tasks.length,
     },
   });
 };
 
-export const getAllTasks = (request, response) => {
+export const getAllTasks = async (request, response) => {
   const {
     query: { filter, value, order, orderBy },
   } = request;
 
-  const { tasks, count } = filterTasks({ filter, value, order, orderBy });
+  const { tasks, error } = await filterTasks({ filter, value, order, orderBy });
 
-  if (tasks) {
-    return response.status(200).send({
-      data: tasks,
-      count,
+  if (error) {
+    return response.status(400).send({
+      error: error.message,
     });
   }
 
   response.status(200).send({
     data: {
       tasks,
-      count,
+      count: tasks.length,
     },
   });
 };
@@ -66,17 +64,30 @@ export const getTasksById = (request, response) => {
   });
 };
 
-export const createTask = (request, response) => {
+export const createTask = async (request, response) => {
   const {
     body: { title, status, priority },
   } = request;
+  console.log("request: ", request);
 
-  const { count } = createNewTask({ title, status, priority });
+  const { task, error } = await createNewTask({
+    title,
+    status,
+    priority,
+    userId: request.user,
+  });
 
-  response.status(201).send({
+  if (error) {
+    return response.status(400).send({
+      data: {
+        error: error.message,
+      },
+    });
+  }
+
+  return response.status(201).send({
     data: {
-      tasks: taskList,
-      count,
+      task,
     },
   });
 };

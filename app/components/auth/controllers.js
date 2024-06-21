@@ -1,21 +1,20 @@
-import { hashPassword } from "../../../utils/helpers.js";
-import { usersList } from "../../../utils/constants.js";
-import { addUser } from "./services.js";
+import { createNewUser } from "./services.js";
 
-export const registerUser = (request, response) => {
-  try {
-    addUser({ ...request.body });
-  } catch (error) {
-    response.status(404).send({
+export const registerUser = async (request, response) => {
+  const { user, error } = await createNewUser({ ...request.body });
+
+  if (error) {
+    return response.status(400).send({
       error: error.message,
     });
   }
-  response.status(200).send({ message: "registered" });
+
+  return response.status(200).send({ user: user.id });
 };
 
 export const login = (request, response) => {
   response.status(200).send({
-    status: "authenticated",
+    isAuthenticated: request.isAuthenticated(),
     user: request.user,
   });
 };
@@ -23,7 +22,7 @@ export const login = (request, response) => {
 export const getAuthStatus = (request, response) => {
   return request.user
     ? response.status(200).send({
-        status: "authenticated",
+        isAuthenticated: request.isAuthenticated(),
         userId: request.user,
       })
     : response.status(401).send({ message: "Not Authenticated" });

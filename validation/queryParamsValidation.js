@@ -5,7 +5,7 @@ export const queryParamsValidationSchema = {
     in: ["query"],
     optional: true,
     isIn: {
-      options: [["ASC", "DSC"]],
+      options: [["asc", "desc"]],
       errorMessage: 'Order must be either "ASC" or "DSC"',
     },
   },
